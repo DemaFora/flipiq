@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How FlipIQ Works — Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f8f7ff;
+    --card: #ffffff;
+    --card2: #f1effe;
+    --accent: #7c3aed;
+    --text: #0f0a1e;
+    --text-dim: #6b7280;
+    --text-muted: #9ca3af;
+    --border: #ede9fe;
+    --success: #2ecc71;
+    --radius: 12px;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+    text-decoration: none;
+  }
+  .logo span { color: var(--text); }
+  header a.back {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  header a.back:hover { color: var(--text); }
+  main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+  .page-title {
+    font-size: 30px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .page-subtitle {
+    color: var(--text-dim);
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+  section {
+    margin-bottom: 40px;
+  }
+  section h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  section p {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+  /* Steps */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    border: 1px solid var(--border);
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    color: white;
+  }
+  .step-body h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .step-body p {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin: 0;
+    line-height: 1.6;
+  }
+  /* Fee table */
+  .fee-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .fee-table th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .fee-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(28,47,71,0.5);
+    color: var(--text-dim);
+    vertical-align: top;
+  }
+  .fee-table tr:last-child td { border-bottom: none; }
+  .fee-table td:first-child { font-weight: 700; color: var(--text); }
+  .fee-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  /* Tips */
+  .tips-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  @media (max-width: 480px) {
+    .tips-grid { grid-template-columns: 1fr; }
+  }
+  .tip-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .tip-card h3 {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .tip-card p {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin: 0;
+  }
+  /* Limitations */
+  .limitation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .limitation-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--card);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 14px;
+  }
+  .limitation-dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    margin-top: 4px;
+  }
+  .limitation-item p {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin: 0;
+    line-height: 1.6;
+  }
+  .limitation-item p strong { color: var(--text); font-weight: 600; }
+  /* Categories */
+  .category-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .cat-tag {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .highlight-box {
+    background: rgba(74,144,217,0.08);
+    border: 1px solid rgba(74,144,217,0.25);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-top: 12px;
+  }
+  .highlight-box p {
+    color: var(--accent);
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+<header>
+  <a href="/" class="logo">Flip<span>IQ</span></a>
+  <a href="/" class="back">Back to app</a>
+</header>
+
+<main>
+  <div class="page-title">How FlipIQ Works</div>
+  <div class="page-subtitle">Everything you need to know to flip smarter — from photo to profit.</div>
+
+  <!-- STEP BY STEP -->
+  <section>
+    <h2>Using FlipIQ — Step by Step</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Take or upload a photo</h3>
+          <p>Tap the camera zone to open your phone's camera directly, or upload from your gallery. On desktop, drag and drop an image or click to browse. The clearer the photo, the better the results.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Tap "Analyze Item"</h3>
+          <p>FlipIQ sends your photo to a vision AI that identifies the item, estimates its condition, and pulls resale pricing based on real market knowledge. This takes about 5–10 seconds.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Review the pricing breakdown</h3>
+          <p>You'll see an estimated sold price range, plus what you'd actually pocket on Depop, Poshmark, and eBay after fees. The best platform for that item is highlighted.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Run the profit calculator</h3>
+          <p>Enter what you'd pay for the item at the thrift store. FlipIQ calculates your net profit after fees — instantly. If it's not worth it, you'll know before you buy.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>Generate your listing</h3>
+          <p>One tap creates a ready-to-paste listing title, description, and hashtags. Copy each section directly to your clipboard and paste into Depop, Poshmark, or wherever you sell.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW PRICING WORKS -->
+  <section>
+    <h2>How Pricing is Calculated</h2>
+    <p>FlipIQ uses GPT-4o Vision — one of the most capable AI models available — to identify your item and estimate realistic resale prices. The AI has been trained on a massive dataset that includes resale market data, brand knowledge, and pricing patterns across platforms.</p>
+    <p>When you submit a photo, the AI identifies the item's brand, category, and estimated condition, then generates a low and high resale estimate based on what similar items actually sell for. It uses mid-market sold price data — not listing prices, which are often inflated.</p>
+    <p>The AI is instructed to be honest: if something is worth $5, it says $5. If something is worth $200, it says $200. The goal is accuracy, not optimism.</p>
+    <div class="highlight-box">
+      <p>Pricing is based on AI estimates from training data, not live sold listings. Treat these as informed starting points, not guarantees. Market prices fluctuate — verify high-value items on the platform directly before buying.</p>
+    </div>
+  </section>
+
+  <!-- PLATFORM FEE BREAKDOWN -->
+  <section>
+    <h2>Platform Fee Breakdown</h2>
+    <p>Every platform takes a cut. FlipIQ calculates your after-fee profit automatically so you always see real numbers.</p>
+    <div class="table-wrap">
+      <table class="fee-table">
+        <thead>
+          <tr>
+            <th>Platform</th>
+            <th>Fee Structure</th>
+            <th>Example: $40 sale</th>
+            <th>You keep</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Depop</td>
+            <td>10% of sale price</td>
+            <td>$4.00 fee</td>
+            <td>$36.00</td>
+          </tr>
+          <tr>
+            <td>Poshmark</td>
+            <td>$2.95 flat (under $15) / 20% (over $15)</td>
+            <td>$8.00 fee</td>
+            <td>$32.00</td>
+          </tr>
+          <tr>
+            <td>eBay</td>
+            <td>12.9% + $0.30 per transaction</td>
+            <td>$5.46 fee</td>
+            <td>$34.54</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:12px;">Note: These are final value fees only. Shipping costs, promoted listing fees, and payment processing are not included. Always factor in shipping when setting your price.</p>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section>
+    <h2>Supported Item Categories</h2>
+    <p>FlipIQ works across a wide range of thrift store finds. The AI can identify items in these categories:</p>
+    <div class="category-grid" style="margin-top:12px;">
+      <span class="cat-tag">Clothing</span>
+      <span class="cat-tag">Shoes</span>
+      <span class="cat-tag">Accessories</span>
+      <span class="cat-tag">Electronics</span>
+      <span class="cat-tag">Home goods</span>
+      <span class="cat-tag">Books</span>
+      <span class="cat-tag">Collectibles</span>
+      <span class="cat-tag">Bags</span>
+      <span class="cat-tag">Jewelry</span>
+      <span class="cat-tag">Sports gear</span>
+    </div>
+    <p style="margin-top:14px;">Branded clothing and designer items tend to get the most accurate pricing estimates. Generic no-brand items may have wider price ranges.</p>
+  </section>
+
+  <!-- PHOTO TIPS -->
+  <section>
+    <h2>Getting the Best Results</h2>
+    <div class="tips-grid">
+      <div class="tip-card">
+        <h3>Use good lighting</h3>
+        <p>Natural light is best. Avoid dark thrift store corners — step near a window or outside before snapping. Dark photos cause inaccurate condition estimates.</p>
+      </div>
+      <div class="tip-card">
+        <h3>Show the brand tag</h3>
+        <p>If there's a visible brand or logo, make sure it's in frame. The AI uses brand recognition to significantly improve pricing accuracy.</p>
+      </div>
+      <div class="tip-card">
+        <h3>Flat lay works best</h3>
+        <p>For clothing, lay the item flat and photograph from above. For shoes, place side by side. Keep the item centered and fill the frame.</p>
+      </div>
+      <div class="tip-card">
+        <h3>Show condition clearly</h3>
+        <p>If there's damage, wear, or staining, photograph it. The AI estimates condition from the photo — hiding flaws leads to inaccurate results.</p>
+      </div>
+      <div class="tip-card">
+        <h3>One item per photo</h3>
+        <p>Scan items individually. Multiple items in one photo confuses the AI and will return results for whichever item it identifies as primary.</p>
+      </div>
+      <div class="tip-card">
+        <h3>Stable, in-focus shots</h3>
+        <p>Blurry photos reduce accuracy. Tap to focus on the item before taking the shot. Most phones handle this automatically in good light.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIMITATIONS -->
+  <section>
+    <h2>Limitations</h2>
+    <div class="limitation-list">
+      <div class="limitation-item">
+        <div class="limitation-dot"></div>
+        <p><strong>AI estimates, not live data.</strong> Prices are based on the AI's training knowledge, not real-time sold listings. For high-value items (over $100), always cross-check on the platform's sold listings before purchasing.</p>
+      </div>
+      <div class="limitation-item">
+        <div class="limitation-dot"></div>
+        <p><strong>Brand accuracy depends on visibility.</strong> If the brand tag isn't visible or the item is unbranded, the AI will estimate based on style and category only. Branded items get more accurate estimates.</p>
+      </div>
+      <div class="limitation-item">
+        <div class="limitation-dot"></div>
+        <p><strong>Regional price variation.</strong> Resale prices vary by location and platform demographics. Depop skews younger and urban; eBay has the broadest buyer base. Local market conditions can affect what actually sells.</p>
+      </div>
+      <div class="limitation-item">
+        <div class="limitation-dot"></div>
+        <p><strong>Condition is estimated, not inspected.</strong> The AI can't smell, feel, or stretch a garment. A visual "good" condition item may have hidden issues. Always inspect thoroughly before buying to flip.</p>
+      </div>
+      <div class="limitation-item">
+        <div class="limitation-dot"></div>
+        <p><strong>No shipping costs included.</strong> Profit calculations only account for platform fees, not shipping. Poshmark buyers pay for shipping by default; Depop and eBay typically require seller-provided labels.</p>
+      </div>
+      <div class="limitation-item">
+        <div class="limitation-dot"></div>
+        <p><strong>Vintage and rare items need manual research.</strong> Highly specific vintage pieces, rare collectibles, or limited releases may require additional research on dedicated marketplaces (Grailed, GOAT, StockX, etc.).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section>
+    <h2>Common Questions</h2>
+    <p><strong>Is this free to use?</strong><br>
+    FlipIQ is free. Each scan uses AI vision which has associated costs, so the tool is provided as-is.</p>
+
+    <p><strong>Are my photos stored?</strong><br>
+    No. Photos are sent to the AI for analysis and immediately discarded. Nothing is stored on any server. Your scan history lives only in your browser session and clears when you close the tab.</p>
+
+    <p><strong>How accurate is the pricing?</strong><br>
+    For common branded clothing and shoes, estimates are generally within 20–30% of actual sold prices. Accuracy decreases for obscure brands, rare items, or heavily damaged goods. Use it as a fast gut-check, not a guarantee.</p>
+
+    <p><strong>Can I use this on desktop?</strong><br>
+    Yes. Drag and drop photos or click the upload zone to browse files. Camera capture is mobile-only.</p>
+
+    <p><strong>What do I do with the listing?</strong><br>
+    Copy the title, description, and hashtags to your clipboard, then paste directly into your listing on Depop, Poshmark, or wherever you sell. The title is optimized for search visibility.</p>
+  </section>
+</main>
+</body>
+</html>

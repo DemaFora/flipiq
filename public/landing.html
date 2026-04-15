@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlipIQ — Know Your Flip Before You Buy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8f7ff;
+      --bg2: #ffffff;
+      --card: #ffffff;
+      --border: #ede9fe;
+      --purple: #7c3aed;
+      --purple-light: #ede9fe;
+      --purple2: #5b21b6;
+      --green: #059669;
+      --pink: #db2777;
+      --text: #0f0a1e;
+      --text-dim: #6b7280;
+      --radius: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* BACKGROUND GLOW */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(124,58,237,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    * { position: relative; z-index: 1; }
+
+    /* NAV */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+      background: rgba(248,247,255,0.8);
+      backdrop-filter: blur(10px);
+    }
+    .logo {
+      font-size: 22px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #7c3aed, #db2777);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+    .nav-cta {
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+      color: #fff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 4px 14px rgba(124,58,237,0.3);
+    }
+    .nav-cta:hover { opacity: 0.9; transform: scale(1.03); }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 80px 24px 50px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--purple-light);
+      border: 1px solid rgba(124,58,237,0.2);
+      color: var(--purple);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 50px;
+      margin-bottom: 28px;
+    }
+    .badge-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .hero h1 {
+      font-size: clamp(36px, 7vw, 64px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+    .grad {
+      background: linear-gradient(135deg, #7c3aed 0%, #db2777 50%, #059669 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 18px;
+      color: var(--text-dim);
+      max-width: 500px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(124,58,237,0.35);
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(124,58,237,0.45); }
+    .btn-secondary {
+      background: white;
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 600;
+      padding: 16px 36px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .btn-secondary:hover { border-color: rgba(124,58,237,0.4); box-shadow: 0 4px 12px rgba(124,58,237,0.12); }
+
+    /* SOCIAL PROOF */
+    .social-proof {
+      text-align: center;
+      padding: 16px 24px 0;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+    .social-proof span { color: var(--green); font-weight: 700; }
+
+    /* MOCKUP */
+    .mockup-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 50px 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .phone {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      width: 260px;
+      padding: 24px 20px;
+      box-shadow: 0 20px 60px rgba(124,58,237,0.1), 0 4px 16px rgba(0,0,0,0.06);
+    }
+    .phone-header { font-size: 12px; font-weight: 700; margin-bottom: 16px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+    .phone-img {
+      width: 100%;
+      height: 140px;
+      background: linear-gradient(135deg, #ede9fe, #fce7f3);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      font-size: 40px;
+      border: 1px solid var(--border);
+    }
+    .result-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+    .result-row:last-child { border-bottom: none; }
+    .result-label { font-size: 12px; color: var(--text-dim); }
+    .result-val { font-size: 14px; font-weight: 700; color: var(--text); }
+    .result-val.green { color: var(--green); }
+    .result-val.purple { color: var(--purple); }
+
+    /* SECTIONS */
+    section { max-width: 1000px; margin: 0 auto; padding: 60px 24px; }
+    .section-tag {
+      display: inline-block;
+      background: var(--purple-light);
+      border: 1px solid rgba(124,58,237,0.2);
+      color: var(--purple);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 50px;
+      margin-bottom: 16px;
+    }
+    section h2 {
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 900;
+      margin-bottom: 48px;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      color: var(--text);
+    }
+
+    /* STEPS */
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .step {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+    .step:hover { border-color: rgba(124,58,237,0.3); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.1); }
+    .step-num {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .step h3 { font-size: 16px; font-weight: 800; margin-bottom: 8px; color: var(--text); }
+    .step p { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+
+    /* FEATURES */
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+    .feature {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .feature-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+    }
+    .feature h3 { font-size: 14px; font-weight: 800; margin-bottom: 6px; color: var(--text); }
+    .feature p { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+
+    /* CTA */
+    .cta-wrap { padding: 0 24px 80px; }
+    .cta-box {
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+      background: linear-gradient(135deg, #ede9fe, #fce7f3);
+      border: 1px solid rgba(124,58,237,0.15);
+      border-radius: 24px;
+      padding: 60px 32px;
+    }
+    .cta-box h2 { font-size: clamp(26px, 4vw, 40px); font-weight: 900; margin-bottom: 16px; letter-spacing: -1px; color: var(--text); }
+    .cta-box p { color: var(--text-dim); margin-bottom: 32px; font-size: 16px; }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--text-dim);
+      font-size: 12px;
+      border-top: 1px solid var(--border);
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">FlipIQ</div>
+    <a href="/app" class="nav-cta">Start Flipping</a>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-badge">
+      <div class="badge-dot"></div>
+      AI-Powered Resell Tool
+    </div>
+    <h1>Stop Leaving<br><span class="grad">Money at the Thrift.</span></h1>
+    <p>Snap any item. Get the resale price instantly. Know your flip before you buy.</p>
+    <div class="hero-btns">
+      <a href="/app" class="btn-primary">Start for Free</a>
+      <a href="#how" class="btn-secondary">See How It Works</a>
+    </div>
+  </div>
+
+  <div class="social-proof">
+    <span>Hundreds</span> of resellers already flipping smarter
+  </div>
+
+  <div class="mockup-wrap">
+    <div class="phone">
+      <div class="phone-header">FlipIQ Analysis</div>
+      <div class="phone-img">👟</div>
+      <div class="result-row">
+        <span class="result-label">Item</span>
+        <span class="result-val">Nike AF1 '07</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Thrift Price</span>
+        <span class="result-val">$8</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Avg Resale</span>
+        <span class="result-val purple">$85–$140</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Verdict</span>
+        <span class="result-val green">Strong Buy</span>
+      </div>
+    </div>
+    <div class="phone">
+      <div class="phone-header">Recent Flips</div>
+      <div class="result-row">
+        <span class="result-label">Levi's 501</span>
+        <span class="result-val green">+$47</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Vintage Tee</span>
+        <span class="result-val green">+$82</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Jordan 1 Low</span>
+        <span class="result-val green">+$120</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Coach Bag</span>
+        <span class="result-val green">+$65</span>
+      </div>
+      <div class="result-row" style="padding-top:14px;border-top:1px solid #ede9fe;border-bottom:none">
+        <span class="result-label">Total Profit</span>
+        <span class="result-val" style="color:#7c3aed;font-size:18px">$314</span>
+      </div>
+    </div>
+  </div>
+
+  <section id="how">
+    <div class="section-tag">How It Works</div>
+    <h2>Three steps.<br>One flip decision.</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Snap a photo</h3>
+        <p>Point your camera at any item in the thrift store. Shoes, clothes, bags, electronics — anything.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>AI checks the market</h3>
+        <p>FlipIQ scans recent sold listings on eBay, Depop, Poshmark, and StockX in real time.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Buy or pass</h3>
+        <p>Get the average resale price and a clear verdict. Make the call in seconds before someone else grabs it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-tag">Why FlipIQ</div>
+    <h2>Built for the<br>next gen reseller.</h2>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon" style="background:#ede9fe">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3>Instant Results</h3>
+        <p>Price research in seconds. Make decisions on the floor.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon" style="background:#d1fae5">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3>Real Sold Data</h3>
+        <p>Actual sold prices, not asking prices. What it really sells for.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon" style="background:#fce7f3">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#db2777" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        </div>
+        <h3>Any Category</h3>
+        <p>Sneakers, vintage, electronics, bags, toys. If it flips, FlipIQ knows it.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon" style="background:#ede9fe">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <h3>Free to Use</h3>
+        <p>No subscription. No credit card. Just open and scan.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta-wrap">
+    <div class="cta-box">
+      <h2>Ready to flip<br><span class="grad">smarter?</span></h2>
+      <p>Join resellers who stopped leaving money at the thrift store.</p>
+      <a href="/app" class="btn-primary" style="display:inline-block;font-size:16px;padding:16px 48px">Get Started Free</a>
+    </div>
+  </div>
+
+  <footer>FlipIQ 2026 — Know your flip before you buy.</footer>
+
+</body>
+</html>

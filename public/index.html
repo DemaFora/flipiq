@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FlipIQ - Resale Pricing Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#f8f7ff;--card:#ffffff;--card2:#f1effe;--accent:#7c3aed;--accent-dim:#6d28d9;--text:#0f0a1e;--text-dim:#6b7280;--text-muted:#9ca3af;--border:#ede9fe;--success:#059669;--warning:#d97706;--danger:#dc2626;--radius:12px;}
+html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100;}
+.logo{font-size:22px;font-weight:800;color:var(--accent);letter-spacing:-0.5px;}
+.logo span{color:var(--text);}
+header nav a{color:var(--text-dim);text-decoration:none;font-size:13px;font-weight:500;}
+main{max-width:480px;margin:0 auto;padding:24px 16px 100px;}
+.tagline{text-align:center;margin-bottom:28px;}
+.tagline h1{font-size:26px;font-weight:800;line-height:1.2;margin-bottom:8px;}
+.tagline p{color:var(--text-dim);font-size:14px;line-height:1.5;}
+.upload-zone{background:var(--card);border:2px dashed #d8b4fe;border-radius:var(--radius);padding:40px 24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;margin-bottom:16px;}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:#0d1f38;}
+.upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{width:52px;height:52px;margin:0 auto 16px;background:var(--card2);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.upload-icon svg{width:24px;height:24px;stroke:var(--accent);}
+.upload-zone h2{font-size:17px;font-weight:600;margin-bottom:6px;}
+.upload-zone p{color:var(--text-dim);font-size:13px;}
+.preview-wrap{display:none;margin-bottom:16px;border-radius:var(--radius);overflow:hidden;position:relative;background:var(--card);}
+.preview-wrap img{width:100%;max-height:320px;object-fit:cover;display:block;}
+.remove-img{position:absolute;top:10px;right:10px;background:rgba(6,13,26,.85);border:1px solid var(--border);color:var(--text-dim);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:500;cursor:pointer;}
+.btn{display:block;width:100%;padding:16px;border-radius:var(--radius);border:none;font-family:'Inter',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s;text-align:center;}
+.btn:active{transform:scale(.98);}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--accent-dim);}
+.btn-secondary{background:var(--card2);color:var(--text);border:1px solid var(--border);}
+.loading-wrap{display:none;text-align:center;padding:40px 0;}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-wrap p{color:var(--text-dim);font-size:14px;}
+#results{display:none;}
+.result-card{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:12px;border:1px solid var(--border);}
+.result-card h3{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:12px;}
+.item-name{font-size:20px;font-weight:700;line-height:1.2;}
+.item-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--card2);color:var(--text-dim);border:1px solid var(--border);}
+.badge-brand{color:var(--accent);border-color:rgba(74,144,217,.3);background:rgba(74,144,217,.08);}
+.badge-condition.excellent{color:var(--success);border-color:rgba(46,204,113,.3);background:rgba(46,204,113,.08);}
+.badge-condition.good{color:#3498db;border-color:rgba(52,152,219,.3);background:rgba(52,152,219,.08);}
+.badge-condition.fair{color:var(--warning);border-color:rgba(243,156,18,.3);background:rgba(243,156,18,.08);}
+.badge-condition.poor{color:var(--danger);border-color:rgba(231,76,60,.3);background:rgba(231,76,60,.08);}
+.why-text{font-size:13px;color:var(--text-dim);margin-top:12px;line-height:1.5;padding-top:12px;border-top:1px solid var(--border);}
+.price-range{text-align:center;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:16px;}
+.price-range .label{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:6px;}
+.price-range .amount{font-size:36px;font-weight:800;color:var(--accent);letter-spacing:-1px;}
+.platforms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.platform-card{background:var(--card2);border-radius:10px;padding:12px 8px;text-align:center;border:1px solid var(--border);}
+.platform-card.best{border-color:var(--accent);background:rgba(74,144,217,.08);}
+.platform-name{font-size:12px;font-weight:700;margin-bottom:4px;color:var(--text-dim);}
+.platform-card.best .platform-name{color:var(--accent);}
+.platform-profit{font-size:18px;font-weight:800;color:var(--text);}
+.platform-fee{font-size:10px;color:var(--text-muted);margin-top:2px;}
+.best-label{font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-top:4px;}
+.calc-row{display:flex;align-items:center;gap:12px;margin-top:12px;}
+.calc-row label{font-size:13px;color:var(--text-dim);white-space:nowrap;flex-shrink:0;}
+.input-dollar{position:relative;flex:1;}
+.input-dollar span{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:15px;font-weight:600;pointer-events:none;}
+.input-dollar input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px 10px 26px;color:var(--text);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;outline:none;}
+.input-dollar input:focus{border-color:var(--accent);}
+.profit-result{margin-top:14px;padding:14px;background:var(--card2);border-radius:10px;border:1px solid var(--border);}
+.profit-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--text-dim);margin-bottom:6px;}
+.profit-row.total{padding-top:10px;border-top:1px solid var(--border);font-size:16px;font-weight:700;color:var(--text);margin-top:4px;}
+.profit-row.total .amount-col{font-size:18px;font-weight:800;}
+.amount-col.positive{color:var(--success);}
+.amount-col.negative{color:var(--danger);}
+.listing-output{display:none;margin-top:12px;}
+.listing-block{background:var(--card2);border-radius:10px;border:1px solid var(--border);margin-bottom:10px;overflow:hidden;}
+.listing-block-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);}
+.listing-block-header span{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);}
+.copy-btn{background:none;border:1px solid var(--border);color:var(--text-dim);border-radius:6px;padding:4px 10px;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent);}
+.copy-btn.copied{border-color:var(--success);color:var(--success);}
+.listing-text{padding:14px;font-size:14px;line-height:1.6;color:var(--text);word-break:break-word;}
+.hashtag-list{padding:12px 14px;display:flex;flex-wrap:wrap;gap:6px;}
+.hashtag-chip{background:rgba(74,144,217,.1);border:1px solid rgba(74,144,217,.25);color:var(--accent);padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;}
+#scan-history-section{display:none;margin-top:32px;}
+#scan-history-section h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:12px;}
+.history-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
+.history-scroll::-webkit-scrollbar{height:0;}
+.history-card{flex-shrink:0;width:120px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;transition:border-color .15s;}
+.history-card:hover{border-color:var(--accent);}
+.history-img{width:100%;height:70px;object-fit:cover;border-radius:6px;margin-bottom:8px;background:var(--card2);}
+.history-name{font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.history-price{font-size:12px;font-weight:700;color:var(--accent);}
+.error-banner{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);color:#e74c3c;border-radius:var(--radius);padding:14px 16px;font-size:13px;margin-bottom:16px;display:none;line-height:1.5;}
+.divider{height:1px;background:var(--border);margin:20px 0;}
+
+.similar-section{margin-top:0;}
+.similar-loading{text-align:center;padding:20px 0;color:var(--text-muted);font-size:13px;}
+.similar-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+.sim-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;overflow:hidden;text-decoration:none;display:block;transition:border-color .15s;}
+.sim-card:hover{border-color:var(--accent);}
+.sim-img{width:100%;height:110px;object-fit:cover;background:var(--card);display:block;}
+.sim-img-placeholder{width:100%;height:110px;background:var(--card);display:flex;align-items:center;justify-content:center;}
+.sim-img-placeholder svg{width:28px;height:28px;stroke:var(--text-muted);}
+.sim-info{padding:8px 10px 10px;}
+.sim-title{font-size:11px;color:var(--text-dim);line-height:1.4;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.sim-price{font-size:15px;font-weight:800;color:var(--success);}
+.sim-badge{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 6px;border-radius:4px;background:rgba(46,204,113,.12);color:var(--success);border:1px solid rgba(46,204,113,.25);margin-left:5px;vertical-align:middle;}
+.search-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.search-link-btn{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;color:#fff;background:var(--card2);border:1px solid var(--border);transition:opacity .15s;display:flex;align-items:center;gap:5px;}
+.search-link-btn:hover{opacity:.85;}
+.search-links-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Flip<span>IQ</span></div>
+  <nav><a href="/docs">How it works</a></nav>
+</header>
+<main>
+  <div class="tagline">
+    <h1>Know your flip before you buy</h1>
+    <p>Snap a photo of any thrift find and get instant resale prices across Depop, Poshmark, and eBay.</p>
+  </div>
+  <div class="upload-zone" id="uploadZone">
+    <input type="file" id="fileInput" accept="image/*" capture="environment">
+    <div class="upload-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+    </div>
+    <h2>Tap to take a photo</h2>
+    <p>Or tap to upload from your gallery</p>
+  </div>
+  <div class="preview-wrap" id="previewWrap">
+    <img id="previewImg" src="" alt="Item preview">
+    <button class="remove-img" id="removeImg">Change photo</button>
+  </div>
+  <div class="error-banner" id="errorBanner"></div>
+  <button class="btn btn-primary" id="analyzeBtn" disabled>Analyze Item</button>
+  <div class="loading-wrap" id="loadingWrap">
+    <div class="spinner"></div>
+    <p>Scanning resale market...</p>
+  </div>
+  <div id="results">
+    <div class="divider"></div>
+    <div class="result-card">
+      <h3>Item Identified</h3>
+      <div class="item-name" id="resItemName"></div>
+      <div class="item-meta" id="resItemMeta"></div>
+      <div class="why-text" id="resWhy"></div>
+    </div>
+    <div class="result-card">
+      <h3>Resale Pricing</h3>
+      <div class="price-range">
+        <div class="label">Estimated Sold Price</div>
+        <div class="amount" id="resPriceRange"></div>
+      </div>
+      <div class="platforms-grid" id="platformsGrid"></div>
+      <div style="font-size:11px;color:var(--text-muted);text-align:center;">After platform fees deducted</div>
+    </div>
+    
+    <div class="result-card similar-section" id="similarSection" style="display:none;">
+      <h3>Similar Sold Listings</h3>
+      <div id="similarLoading" class="similar-loading">Loading comparable sales...</div>
+      <div id="similarGrid" class="similar-grid" style="display:none;"></div>
+      <div id="searchLinksWrap" style="display:none;">
+        <div class="search-links-label">Search live listings</div>
+        <div class="search-links" id="searchLinks"></div>
+      </div>
+    </div>
+<div class="result-card">
+      <h3>Profit Calculator</h3>
+      <div class="calc-row">
+        <label>I would pay</label>
+        <div class="input-dollar">
+          <span>$</span>
+          <input type="number" id="costInput" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <label>for this</label>
+      </div>
+      <div class="profit-result" id="profitResult">
+        <div class="profit-row"><span>List at (midpoint)</span><span id="profitListAt">--</span></div>
+        <div class="profit-row"><span>Platform fee</span><span id="profitFee">--</span></div>
+        <div class="profit-row"><span>Your cost</span><span id="profitCost">--</span></div>
+        <div class="profit-row total"><span>Net profit</span><span class="amount-col" id="profitNet">Enter cost above</span></div>
+      </div>
+    </div>
+    <div class="result-card">
+      <h3>Listing Generator</h3>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:12px;">Generate a ready-to-paste listing for your best platform.</p>
+      <button class="btn btn-secondary" id="generateListingBtn">Generate Listing</button>
+      <div class="listing-output" id="listingOutput">
+        <div style="height:12px;"></div>
+        <div class="listing-block">
+          <div class="listing-block-header"><span>Title</span><button class="copy-btn" data-target="listingTitle">Copy</button></div>
+          <div class="listing-text" id="listingTitle"></div>
+        </div>
+        <div class="listing-block">
+          <div class="listing-block-header"><span>Description</span><button class="copy-btn" data-target="listingDesc">Copy</button></div>
+          <div class="listing-text" id="listingDesc"></div>
+        </div>
+        <div class="listing-block">
+          <div class="listing-block-header"><span>Hashtags</span><button class="copy-btn" data-target="listingHashtags">Copy</button></div>
+          <div class="hashtag-list" id="listingHashtags"></div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-secondary" id="newScanBtn" style="margin-top:4px;">Scan Another Item</button>
+  </div>
+  <div id="scan-history-section">
+    <h3>Recent Scans</h3>
+    <div class="history-scroll" id="historyScroll"></div>
+  </div>
+</main>
+<script>
+let currentImage=null,currentAnalysis=null;
+const fileInput=document.getElementById('fileInput'),uploadZone=document.getElementById('uploadZone'),previewWrap=document.getElementById('previewWrap'),previewImg=document.getElementById('previewImg'),removeImg=document.getElementById('removeImg'),analyzeBtn=document.getElementById('analyzeBtn'),loadingWrap=document.getElementById('loadingWrap'),results=document.getElementById('results'),errorBanner=document.getElementById('errorBanner'),costInput=document.getElementById('costInput'),generateListingBtn=document.getElementById('generateListingBtn'),listingOutput=document.getElementById('listingOutput');
+fileInput.addEventListener('change',e=>{const f=e.target.files[0];if(f)loadFile(f);});
+function loadFile(file){const r=new FileReader();r.onload=ev=>{currentImage=ev.target.result;previewImg.src=currentImage;previewWrap.style.display='block';uploadZone.style.display='none';analyzeBtn.disabled=false;hideError();hideResults();};r.readAsDataURL(file);}
+removeImg.addEventListener('click',()=>{currentImage=null;previewImg.src='';previewWrap.style.display='none';uploadZone.style.display='block';analyzeBtn.disabled=true;fileInput.value='';hideResults();});
+uploadZone.addEventListener('dragover',e=>{e.preventDefault();uploadZone.classList.add('drag-over');});
+uploadZone.addEventListener('dragleave',()=>uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop',e=>{e.preventDefault();uploadZone.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadFile(f);});
+analyzeBtn.addEventListener('click',async()=>{if(!currentImage)return;hideError();showLoading(true);hideResults();try{const res=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:currentImage})});const data=await res.json();if(!res.ok||data.error)throw new Error(data.error||'Analysis failed');currentAnalysis=data;renderResults(data);saveToHistory(data,currentImage);}catch(err){showError('Analysis failed: '+err.message);}finally{showLoading(false);}});
+function renderResults(d){
+  document.getElementById('resItemName').textContent=d.item_name;
+  const meta=document.getElementById('resItemMeta');meta.innerHTML='';
+  if(d.brand&&d.brand!=='Unknown')meta.innerHTML+='<span class="badge badge-brand">'+d.brand+'</span>';
+  if(d.category)meta.innerHTML+='<span class="badge">'+cap(d.category)+'</span>';
+  if(d.condition_estimate)meta.innerHTML+='<span class="badge badge-condition '+d.condition_estimate+'">'+cap(d.condition_estimate)+' condition</span>';
+  document.getElementById('resWhy').textContent=d.why;
+  document.getElementById('resPriceRange').textContent='$'+d.resale_price_low+' - $'+d.resale_price_high;
+  const mid=(d.resale_price_low+d.resale_price_high)/2;
+  const plats=calcPlats(mid);
+  const grid=document.getElementById('platformsGrid');grid.innerHTML='';
+  plats.forEach(p=>{const best=p.name===d.best_platform;grid.innerHTML+='<div class="platform-card'+(best?' best':'')+'"><div class="platform-name">'+p.name+'</div><div class="platform-profit">$'+p.net.toFixed(2)+'</div><div class="platform-fee">'+p.feeLabel+'</div>'+(best?'<div class="best-label">Best</div>':'')+'</div>';});
+  updateProfit();costInput.oninput=updateProfit;
+  results.style.display='block';results.scrollIntoView({behavior:'smooth',block:'start'});loadSimilarListings(d);
+}
+function calcPlats(price){
+  const dep=price*0.1;
+  const posh=price<15?2.95:price*0.2;
+  const ebay=price*0.129+0.3;
+  return[{name:'Depop',net:Math.max(0,price-dep),feeLabel:'10% fee'},{name:'Poshmark',net:Math.max(0,price-posh),feeLabel:price<15?'$2.95 flat':'20% fee'},{name:'eBay',net:Math.max(0,price-ebay),feeLabel:'12.9% + $0.30'}];
+}
+function updateProfit(){if(!currentAnalysis)return;const cost=parseFloat(costInput.value)||0;const mid=(currentAnalysis.resale_price_low+currentAnalysis.resale_price_high)/2;const plats=calcPlats(mid);const best=plats.find(p=>p.name===currentAnalysis.best_platform)||plats[0];const fee=mid-best.net;const net=best.net-cost;document.getElementById('profitListAt').textContent='$'+mid.toFixed(2);document.getElementById('profitFee').textContent='-$'+fee.toFixed(2)+' ('+best.name+')';document.getElementById('profitCost').textContent=cost>0?'-$'+cost.toFixed(2):'--';const el=document.getElementById('profitNet');if(cost>0){el.textContent=(net>=0?'+':'')+'$'+net.toFixed(2);el.className='amount-col '+(net>=0?'positive':'negative');}else{el.textContent='$'+best.net.toFixed(2)+' (enter cost above)';el.className='amount-col';}}
+generateListingBtn.addEventListener('click',async()=>{if(!currentAnalysis)return;generateListingBtn.disabled=true;generateListingBtn.textContent='Generating...';listingOutput.style.display='none';try{const res=await fetch('/api/generate-listing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({item:currentAnalysis})});const data=await res.json();if(!res.ok||data.error)throw new Error(data.error||'Failed');document.getElementById('listingTitle').textContent=data.title;document.getElementById('listingDesc').textContent=data.description;const hc=document.getElementById('listingHashtags');hc.innerHTML='';(data.hashtags||[]).forEach(t=>{const c=document.createElement('span');c.className='hashtag-chip';c.textContent=t.startsWith('#')?t:'#'+t;hc.appendChild(c);});listingOutput.style.display='block';}catch(err){showError('Listing failed: '+err.message);}finally{generateListingBtn.disabled=false;generateListingBtn.textContent='Generate Listing';}});
+document.addEventListener('click',e=>{const btn=e.target.closest('.copy-btn');if(!btn)return;const id=btn.dataset.target;const el=document.getElementById(id);let text=id==='listingHashtags'?Array.from(el.querySelectorAll('.hashtag-chip')).map(c=>c.textContent).join(' '):el.textContent;navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2000);});});
+function saveToHistory(a,img){let h=getHistory();h.unshift({analysis:a,image:img,ts:Date.now()});h=h.slice(0,10);sessionStorage.setItem('flipiq_history',JSON.stringify(h));renderHistory();}
+function getHistory(){try{return JSON.parse(sessionStorage.getItem('flipiq_history')||'[]');}catch{return[];}}
+function renderHistory(){const h=getHistory();const sec=document.getElementById('scan-history-section');const sc=document.getElementById('historyScroll');if(!h.length){sec.style.display='none';return;}sec.style.display='block';sc.innerHTML='';h.forEach(item=>{const mid=(item.analysis.resale_price_low+item.analysis.resale_price_high)/2;const card=document.createElement('div');card.className='history-card';card.innerHTML='<img class="history-img" src="'+item.image+'" alt=""><div class="history-name">'+item.analysis.item_name+'</div><div class="history-price">$'+mid.toFixed(0)+'</div>';card.addEventListener('click',()=>{currentImage=item.image;currentAnalysis=item.analysis;previewImg.src=item.image;previewWrap.style.display='block';uploadZone.style.display='none';analyzeBtn.disabled=false;listingOutput.style.display='none';renderResults(item.analysis);});sc.appendChild(card);});}
+document.getElementById('newScanBtn').addEventListener('click',()=>{currentImage=null;currentAnalysis=null;previewImg.src='';previewWrap.style.display='none';uploadZone.style.display='block';analyzeBtn.disabled=true;fileInput.value='';costInput.value='';listingOutput.style.display='none';document.getElementById('similarSection').style.display='none';hideResults();hideError();window.scrollTo({top:0,behavior:'smooth'});});
+function showLoading(s){loadingWrap.style.display=s?'block':'none';analyzeBtn.style.display=s?'none':'block';}
+function hideResults(){results.style.display='none';}
+function showError(m){errorBanner.textContent=m;errorBanner.style.display='block';}
+function hideError(){errorBanner.style.display='none';}
+function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'';}
+renderHistory();
+
+async function loadSimilarListings(analysis) {
+  const sec = document.getElementById('similarSection');
+  const loading = document.getElementById('similarLoading');
+  const grid = document.getElementById('similarGrid');
+  const linksWrap = document.getElementById('searchLinksWrap');
+  const linksEl = document.getElementById('searchLinks');
+  sec.style.display = 'block';
+  loading.style.display = 'block';
+  grid.style.display = 'none';
+  linksWrap.style.display = 'none';
+  grid.innerHTML = '';
+  linksEl.innerHTML = '';
+  try {
+    const q = [analysis.brand !== 'Unknown' ? analysis.brand : '', analysis.item_name].filter(Boolean).join(' ').trim();
+    const res = await fetch('/api/similar?q=' + encodeURIComponent(q) + '&category=' + encodeURIComponent(analysis.category || ''));
+    const data = await res.json();
+    loading.style.display = 'none';
+    if (data.results && data.results.length > 0) {
+      data.results.forEach(item => {
+        const card = document.createElement('a');
+        card.className = 'sim-card';
+        card.href = item.url || '#';
+        card.target = '_blank';
+        card.rel = 'noopener';
+        const imgHTML = item.image
+          ? '<img class="sim-img" src="' + item.image + '" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<div class=sim-img-placeholder><svg viewBox=\'0 0 24 24\' fill=\'none\' stroke-width=\'1.5\' stroke-linecap=\'round\'><rect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'2\'/><circle cx=\'8.5\' cy=\'8.5\' r=\'1.5\'/><polyline points=\'21 15 16 10 5 21\'/></svg></div>'">'
+          : '<div class="sim-img-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>';
+        const price = item.price ? '
+
+
+
+
+</body>
+</html> + parseFloat(item.price).toFixed(2) : 'Sold';
+        card.innerHTML = imgHTML + '<div class="sim-info"><div class="sim-title">' + esc(item.title) + '</div><div class="sim-price">' + price + '<span class="sim-badge">Sold</span></div></div>';
+        grid.appendChild(card);
+      });
+      grid.style.display = 'grid';
+    }
+    if (data.search_links && data.search_links.length > 0) {
+      data.search_links.forEach(sl => {
+        const a = document.createElement('a');
+        a.className = 'search-link-btn';
+        a.href = sl.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.style.borderColor = sl.color + '44';
+        a.style.color = sl.color;
+        a.textContent = sl.platform;
+        linksEl.appendChild(a);
+      });
+      linksWrap.style.display = 'block';
+    }
+    if (data.no_key && (!data.results || !data.results.length)) {
+      loading.style.display = 'block';
+      loading.textContent = 'Add EBAY_APP_ID to enable sold price data.';
+    }
+  } catch(e) {
+    loading.textContent = 'Could not load comparables.';
+  }
+}
+
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+</script>
+</body>
+</html>
