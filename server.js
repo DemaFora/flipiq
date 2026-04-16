@@ -8,7 +8,7 @@ app.get('/', (req, res) => res.sendFile(require('path').join(__dirname, 'public'
 app.get('/app', (req, res) => res.sendFile(require('path').join(__dirname, 'public', 'index.html')));
 app.use(express.static(__dirname + '/public'));
 
-const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY || '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';
+const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY || '';
 
 app.post('/api/analyze', async (req, res) => {
   try {
